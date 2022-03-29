@@ -8,7 +8,7 @@ export default function SendSMS({ sendSMSRequest }) {
         let messageLength = element.target.value.length
         let statusElement = document.getElementById("charCounter")
         let message;
-        if(messageLength < 160){
+        if(messageLength <= 160){
             message = `${messageLength}/160 used`;
         } else {
             message = `A multiple of <strong>${Math.ceil(messageLength/160)}</strong> messages`;
@@ -43,7 +43,7 @@ export default function SendSMS({ sendSMSRequest }) {
                 <Form.Group className="mb-3" controlId="formBasicTO">
                     <Form.Control as="textarea" type="textarea" placeholder="Message" onChange={handleChange}/>
                     <Form.Text className="text-muted" id="charCounter">
-                        We will count your characters
+                     0/160 used
                     </Form.Text>
                 </Form.Group>
 
