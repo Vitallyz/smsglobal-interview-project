@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Button, Container } from "react-bootstrap";
 
-export default function SendSMS({ sendSMSRequest }) {
+export default function SendSMS({ sendSMSMessage }) {
 
     function handleChange(element){
         // console.log(element.target.value.length)
@@ -17,6 +17,11 @@ export default function SendSMS({ sendSMSRequest }) {
         statusElement.innerHTML = message 
     }
 
+    function handleSubmit(element){
+        element.preventDefault()
+        console.log("We are trying to send SMS using these data: ", element)
+        sendSMSMessage(element);
+    }
 
     return (
         <><Container
@@ -31,17 +36,17 @@ export default function SendSMS({ sendSMSRequest }) {
                 display: "block",
                 justifyContent: "center",
                 alignItems: "center",
-            }}>
+            }} onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formBasicFrom">
                     <Form.Label>Use this form to send SMS</Form.Label>
                     <Form.Control required type="text" placeholder="from" />
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="formBasicTo">
-                    <Form.Control type="text" placeholder="To" />
+                    <Form.Control required  type="text" placeholder="To" />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicTO">
-                    <Form.Control as="textarea" type="textarea" placeholder="Message" onChange={handleChange}/>
+                    <Form.Control required  as="textarea" type="textarea" placeholder="Message" onChange={handleChange}/>
                     <Form.Text className="text-muted" id="charCounter">
                      0/160 used
                     </Form.Text>

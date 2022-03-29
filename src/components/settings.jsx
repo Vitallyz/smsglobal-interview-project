@@ -3,10 +3,10 @@ import { Form, Button, Container, CloseButton, Card } from 'react-bootstrap';
 
 
 export default function Settings({ activeKey, APIKeys, updateActiveKey, addAPIKey, deleteKeyFromDB }) {
-    function handleSubmit(event) {
-        event.preventDefault();
-        console.log(event.target[0].value)
-        addAPIKey(event)
+    function handleSubmit(element) {
+        element.preventDefault();
+        console.log(element.target[0].value)
+        addAPIKey(element)
     }
 
     function deleteKey(event) {

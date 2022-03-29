@@ -160,6 +160,38 @@ function App() {
     });
   }
 
+  function handleRequestSendSMSMessage(smsData){
+    let outNumber = smsData.target[0].value;
+    let inNumber = smsData.target[1].value;
+    let message = smsData.target[2].value;
+
+    console.log("Sending SMS message request to server! with Key and Secret: ", activeKey.key, activeKey.secret)
+    let method = "POST";
+    let authHeader = getAuthHeader(method);
+    console.log("authHeader is: ", authHeader)
+    let data = { message:message, origin:outNumber, destination:inNumber };
+    let headers = "";
+
+    axios({
+      url: `http://${host}${uri}`,
+      method,
+      data,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+        ...headers
+      }
+    })
+    .then(response => {
+      console.log("Successfully sent SMS message to server with response: ", response)
+      setSMSData()
+    })
+    .catch(error => {
+      console.log("Error sending SMS message to server", error);
+    });
+  }
+
 
   return (
     <>
@@ -188,7 +220,7 @@ function App() {
         <Routes >
           <Route path="/" element={<Settings activeKey={activeKey} APIKeys={APIKeys} updateActiveKey={updateKey} addAPIKey={addAPIKey} deleteKeyFromDB={deleteKey} /> } />
           <Route path="settings" element={<Settings activeKey={activeKey} APIKeys={APIKeys} updateActiveKey={updateKey} addAPIKey={addAPIKey} deleteKeyFromDB={deleteKey} />} />
-          <Route path="sendsms" element={<SendSMS />} />
+          <Route path="sendsms" element={<SendSMS sendSMSMessage={handleRequestSendSMSMessage}/>} />
           <Route path="report" element={<Report activeKey={activeKey} requestSMSData={handleRequestSMSData} smsData={smsData}/>} />
         </Routes>
       </Container>
