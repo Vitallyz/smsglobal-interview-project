@@ -2,6 +2,7 @@ import { Navbar, Nav, Container } from "react-bootstrap";
 import { Link, Route, Routes } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Crypto from 'crypto-js';
 
 import './App.css';
 import Settings from "./components/settings";
@@ -10,6 +11,10 @@ import Report from "./components/report";
 
 const DB_ADDRESS = "http://localhost:3020/";
 
+const uri = "/v2/sms/";
+const host = "api.smsglobal.com";
+const port = 80;
+
 
 function App() {
   let activeKeyID;
@@ -17,11 +22,7 @@ function App() {
   const [activeKey, setActiveKey] = useState();
   const [APIKeys, setAPIKeys] = useState();
 
-  function getReportData() {
-
-  }
-
-
+  const [smsData, setSMSData] = useState();
 
   function getActiveKeyFromDB() {
     axios.get(DB_ADDRESS + 'activekey')
@@ -51,7 +52,10 @@ function App() {
   }
 
   useEffect(() => {
+    console.log("Loading page, APIKeys: ", APIKeys)
     getActiveKeyFromDB();
+
+
   }, []);
 
   function updateKey(key) {
@@ -97,25 +101,83 @@ function App() {
       })
   }
 
+  function getAuthHeader(requestMethod) {
+    console.log("trying to construct Auth Header. ActiveKey is: ", activeKey)
+    let id = activeKey.key;
+    let ts = Math.floor(new Date().getTime() / 1000);
+    let nonce = getNonce(10);
+    let method = requestMethod;
+
+    let strings = [ts, nonce, method, uri, host, port];
+    let macString = strings.join('\n') + "\n\n";
+    console.log("macString is: ", macString);
+    let macHash = Crypto.HmacSHA256(macString, activeKey.secret);
+    let macBase64 = Crypto.enc.Base64.stringify(macHash);
+
+    return `MAC id="${id}", ts="${ts}", nonce="${nonce}", mac="${macBase64}"`;
+
+  }
+
+
+   
+
+  function getNonce(length) {
+    let nonce = "";
+    let charOptions = "qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP1234567890";
+    for(let i = 0; i < length; i++) {
+      nonce += charOptions.charAt(Math.floor(Math.random() * charOptions.length));
+    }
+    console.log("Nonce this time is: ", nonce);
+    return nonce;
+  }
+
+  function handleRequestSMSData () {
+    console.log("Requesting SMS data from server! with Key and Secret: ", activeKey.key, activeKey.secret)
+    let method = "GET";
+    let authHeader = getAuthHeader(method);
+    console.log("authHeader is: ", authHeader)
+    let data = {};
+    let headers = "";
+
+    axios({
+      url: `http://${host}${uri}`,
+      method,
+      data,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+        ...headers
+      }
+    })
+    .then(response => {
+      console.log("Successfully got SMS data from server: ", response.data.messages)
+      setSMSData(response.data.messages)
+    })
+    .catch(error => {
+      console.log("Error getting SMS Data from server", error);
+    });
+  }
+
 
   return (
     <>
       <Container
         style={{
-          width: "600px",
+          width: "800px",
           display: "block",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
 
-        <Navbar bg="light" variant="light">
+        <Navbar bg="light" variant="light" >
           <Container>
             {/* <Navbar.Brand href="/">SMSGlobal</Navbar.Brand> */}
-            <Nav className="me-auto">
-              <Nav.Link href="/settings">Setings</Nav.Link>
-              <Nav.Link href="/sendsms">Send SMS</Nav.Link>
-              <Nav.Link href="/report">Report</Nav.Link>
+            <Nav className="me-auto" defaultActiveKey="/settings">
+              <Nav.Link  as={Link} to="/settings">Setings</Nav.Link>
+              <Nav.Link as={Link} to="/sendsms">Send SMS</Nav.Link>
+              <Nav.Link as={Link} to="/report">Report</Nav.Link>
             </Nav>
           </Container>
         </Navbar>
@@ -126,7 +188,7 @@ function App() {
           {/* <Route path="/" element={<Settings />} /> */}
           <Route path="settings" element={<Settings activeKey={activeKey} APIKeys={APIKeys} updateActiveKey={updateKey} addAPIKey={addAPIKey} deleteKeyFromDB={deleteKey} />} />
           <Route path="sendsms" element={<SendSMS />} />
-          <Route path="report" element={<Report />} />
+          <Route path="report" element={<Report activeKey={activeKey} requestSMSData={handleRequestSMSData} smsData={smsData}/>} />
         </Routes>
       </Container>
     </>

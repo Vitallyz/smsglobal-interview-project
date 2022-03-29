@@ -18,13 +18,13 @@ export default function Settings({ activeKey, APIKeys, updateActiveKey, addAPIKe
         return (
             <><Container
                 style={{
-                    width: "600px",
+                    width: "800px",
                     display: "block",
                     justifyContent: "center",
                     alignItems: "center",
                 }}>
                 <Form style={{ width: 400 }} onSubmit={handleSubmit}>
-                    <br></br>
+                    
                     <Form.Group className="mb-3" controlId="formBasicName">
                         <Form.Label>Add API Key</Form.Label>
                         <Form.Control type="Name" name="Name" placeholder="Name" />
@@ -41,7 +41,7 @@ export default function Settings({ activeKey, APIKeys, updateActiveKey, addAPIKe
                         Add
                     </Button>
                 </Form>
-                <br></br>
+                <hr style={{ width: 550}}></hr>
                 <ListGroup  style={{ width: 550 }}>
                                 {APIKeys.map((apikey, key) => (<ListGroup.Item key={key} 
                                                                                 value={apikey.id} 
