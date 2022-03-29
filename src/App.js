@@ -62,6 +62,7 @@ function App() {
     console.log("Updating key in database. Key is: ", key.target.value);
     axios.patch(DB_ADDRESS + "activekey", { id: key.target.value })
     activeKeyID = key.target.value;
+    setSMSData();
     getKeyDataFromDB();
   }
 
@@ -185,7 +186,7 @@ function App() {
 
 
         <Routes >
-          {/* <Route path="/" element={<Settings />} /> */}
+          <Route path="/" element={<Settings activeKey={activeKey} APIKeys={APIKeys} updateActiveKey={updateKey} addAPIKey={addAPIKey} deleteKeyFromDB={deleteKey} /> } />
           <Route path="settings" element={<Settings activeKey={activeKey} APIKeys={APIKeys} updateActiveKey={updateKey} addAPIKey={addAPIKey} deleteKeyFromDB={deleteKey} />} />
           <Route path="sendsms" element={<SendSMS />} />
           <Route path="report" element={<Report activeKey={activeKey} requestSMSData={handleRequestSMSData} smsData={smsData}/>} />
