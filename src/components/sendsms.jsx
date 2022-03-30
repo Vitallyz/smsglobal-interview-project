@@ -3,27 +3,25 @@ import { Form, Button, Container } from "react-bootstrap";
 
 export default function SendSMS({ sendSMSMessage }) {
 
-    function handleChange(element){
+    function handleChange(element) {
         // console.log(element.target.value.length)
         let messageLength = element.target.value.length
         let statusElement = document.getElementById("charCounter")
         let message;
-        if(messageLength <= 160){
+        if (messageLength <= 160) {
             message = `${messageLength}/160 used`;
         } else {
-            message = `A multiple of <strong>${Math.ceil(messageLength/160)}</strong> messages`;
+            message = `A multiple of <strong>${Math.ceil(messageLength / 160)}</strong> messages`;
         }
-                
-        statusElement.innerHTML = message 
+
+        statusElement.innerHTML = message
     }
 
-    function handleSubmit(element){
+    function handleSubmit(element) {
         element.preventDefault()
-        console.log("We are trying to send SMS using these data: ", element)
+        // console.log("We are trying to send SMS using these data: ", element)
         sendSMSMessage(element);
     }
-
-    
 
     return (
         <><Container
@@ -45,12 +43,12 @@ export default function SendSMS({ sendSMSMessage }) {
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="formBasicTo">
-                    <Form.Control required  type="text" placeholder="To" />
+                    <Form.Control required type="text" placeholder="To" />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicTO">
-                    <Form.Control required  as="textarea" type="textarea" placeholder="Message" onChange={handleChange}/>
+                    <Form.Control required as="textarea" type="textarea" placeholder="Message" onChange={handleChange} />
                     <Form.Text className="text-muted" id="charCounter">
-                     0/160 used
+                        0/160 used
                     </Form.Text>
                 </Form.Group>
 

@@ -51,17 +51,13 @@ function App() {
           // console.log("Did not find data for id: ", activeKey)
           activeKeyID = response.data[0].id;
         }
-
         setActiveKey(response.data.filter(key => key.id == activeKeyID)[0]);
-
       })
   }
 
   useEffect(() => {
     // console.log("Loading page, APIKeys: ", APIKeys)
     getActiveKeyFromDB();
-
-
   }, []);
 
   function updateKey(key) {
@@ -74,7 +70,6 @@ function App() {
   }
 
   function addAPIKey(event) {
-
     let apiKeyObject = {
       name: event.target[0].value,
       key: event.target[1].value,
@@ -82,11 +77,9 @@ function App() {
     }
 
     // console.log("Adding new key for name and apikey: ", apiKeyObject);
-
     axios.post(DB_ADDRESS + 'apikeys', apiKeyObject)
       .then(response => {
         // console.log("Response from db insert, id: ", response.data.id);
-        // setActiveKey(response.data.id);
         // console.log("Setting active key to: ", response.data.id)
         axios.patch(DB_ADDRESS + "activekey", { id: response.data.id })
           .then(response => {
@@ -124,11 +117,7 @@ function App() {
     let macBase64 = Crypto.enc.Base64.stringify(macHash);
 
     return `MAC id="${id}", ts="${ts}", nonce="${nonce}", mac="${macBase64}"`;
-
   }
-
-
-
 
   function getNonce(length) {
     let nonce = "";
@@ -148,7 +137,8 @@ function App() {
     let data = {};
     let headers = "";
 
-    if(activeKeyIsFaulty){
+    // prevent from infinit loop showing error modal alert when failed to grapb the messages table
+    if (activeKeyIsFaulty) {
       return;
     }
 
@@ -212,72 +202,69 @@ function App() {
   function showErrorAlert() {
     setAlertErrorShow(true)
   }
-  
+
   function showSuccessAlert() {
     setAlertSuccessShow(true)
   }
-    return (
-      <>
-        <Modal
-          size="sm"
-          show={alertErrorShowShow}
-          onHide={() => setAlertErrorShow(false)}
-          aria-labelledby="error-modal"
-          className="error-modal"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title id="error-modal-title">
-              Failed
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>Check your connection and API keys</Modal.Body>
-        </Modal>
-        <Modal
-          size="sm"
-          show={alertSuccessShow}
-          onHide={() => setAlertSuccessShow(false)}
-          aria-labelledby="success-modal"
-          className="success-modal"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title id="success-modal-title">
-              Success
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>All done.</Modal.Body>
-        </Modal>
+  return (
+    <>
+      <Modal
+        size="sm"
+        show={alertErrorShowShow}
+        onHide={() => setAlertErrorShow(false)}
+        aria-labelledby="error-modal"
+        className="error-modal"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="error-modal-title">
+            Failed
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Check your connection and API keys</Modal.Body>
+      </Modal>
+      <Modal
+        size="sm"
+        show={alertSuccessShow}
+        onHide={() => setAlertSuccessShow(false)}
+        aria-labelledby="success-modal"
+        className="success-modal"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="success-modal-title">
+            Success
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>All done.</Modal.Body>
+      </Modal>
 
-        <Container
-          style={{
-            width: "800px",
-            display: "block",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+      <Container
+        style={{
+          width: "800px",
+          display: "block",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Navbar bg="light" variant="light" >
+          <Container>
+            {/* <Navbar.Brand href="/">SMSGlobal</Navbar.Brand> */}
+            <Nav className="me-auto" defaultActiveKey="/settings">
+              <Nav.Link as={Link} to="/settings">Setings</Nav.Link>
+              <Nav.Link as={Link} to="/sendsms">Send SMS</Nav.Link>
+              <Nav.Link as={Link} to="/report">Report</Nav.Link>
+            </Nav>
+          </Container>
+        </Navbar>
 
-          <Navbar bg="light" variant="light" >
-            <Container>
-              {/* <Navbar.Brand href="/">SMSGlobal</Navbar.Brand> */}
-              <Nav className="me-auto" defaultActiveKey="/settings">
-                <Nav.Link as={Link} to="/settings">Setings</Nav.Link>
-                <Nav.Link as={Link} to="/sendsms">Send SMS</Nav.Link>
-                <Nav.Link as={Link} to="/report">Report</Nav.Link>
-              </Nav>
-            </Container>
-          </Navbar>
+        <Routes >
+          <Route path="/" element={<Settings activeKey={activeKey} APIKeys={APIKeys} updateActiveKey={updateKey} addAPIKey={addAPIKey} deleteKeyFromDB={deleteKey} />} />
+          <Route path="settings" element={<Settings activeKey={activeKey} APIKeys={APIKeys} updateActiveKey={updateKey} addAPIKey={addAPIKey} deleteKeyFromDB={deleteKey} />} />
+          <Route path="sendsms" element={<SendSMS sendSMSMessage={handleRequestSendSMSMessage} />} />
+          <Route path="report" element={<Report activeKey={activeKey} requestSMSData={handleRequestSMSData} smsData={smsData} />} />
+        </Routes>
+      </Container>
+    </>
+  );
+}
 
-
-
-          <Routes >
-            <Route path="/" element={<Settings activeKey={activeKey} APIKeys={APIKeys} updateActiveKey={updateKey} addAPIKey={addAPIKey} deleteKeyFromDB={deleteKey} />} />
-            <Route path="settings" element={<Settings activeKey={activeKey} APIKeys={APIKeys} updateActiveKey={updateKey} addAPIKey={addAPIKey} deleteKeyFromDB={deleteKey} />} />
-            <Route path="sendsms" element={<SendSMS sendSMSMessage={handleRequestSendSMSMessage} />} />
-            <Route path="report" element={<Report activeKey={activeKey} requestSMSData={handleRequestSMSData} smsData={smsData} />} />
-          </Routes>
-        </Container>
-      </>
-    );
-  }
-
-  export default App;
+export default App;
