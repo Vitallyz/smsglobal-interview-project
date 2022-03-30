@@ -36,3 +36,13 @@
     transform: rotate(360deg);
   }
 }
+
+.error-modal .modal-content {
+  background-color: rgb(182, 88, 88);
+  color: white;
+}
+
+.success-modal .modal-content{
+  background-color: rgb(74, 175, 141);
+}
+
